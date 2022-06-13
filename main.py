@@ -49,18 +49,33 @@ def parse_file_to_data(file, extension, table_name):
     :param table_name: the table identifier
     :return: a list of the quizzers
     """
+    # Reads the html table using pandas
     temp_table = pd.read_html(file_to_var(file, extension), match=table_name, header=0,
                               converters={'Q%': remove_percent})
+
+    # Selects the second table, the individuals                          
     df = temp_table[1]
+
+    # Selects the first table, the teams (used for calculating total matches played)
     df_two = temp_table[0]
+
+    # Replaces null values with 0
     df_two = df_two.fillna(0)
-    df_two.to_html('files/testing.html')
+
+    # Selects the 'W / L' column, removes spaces, and splits it at the '/' to get a wins and losses
     win_loss_array = df_two['W / L'][1].replace(' ', '').split('/')
+
+    # Number of rounds is the won rounds plus the lost rounds. Same for all teams, so selects the first one.
     number_of_rounds = int(win_loss_array[0]) + int(win_loss_array[1])
+
+    # Replaces null (NaN) values with 0
     df = df.fillna(0)
-    # df.to_html('files/testing.html')
+
+
     quizzers_return_me = {}
+
     for index, row in df.iterrows():
+        # Creates a quizzer in an array for each row
         quizzers_return_me[row['Quizzer'] + '; ' + row['Team / Church']] = {
             'Place': row['#'],
             'Total': row['- Total -'],
@@ -73,6 +88,7 @@ def parse_file_to_data(file, extension, table_name):
 
 
 if __name__ == '__main__':
+    # Parses all the files to data
     fBlue = parse_file_to_data('f-blue', 'html', '- Total -')
     fGreen = parse_file_to_data('f-green', 'html', '- Total -')
     fYellow = parse_file_to_data('f-yellow', 'html', '- Total -')
@@ -88,6 +104,7 @@ if __name__ == '__main__':
     sTan = parse_file_to_data('s-tan', 'html', '- Total -')
     sYellow = parse_file_to_data('s-yellow', 'html', '- Total -')
 
+    # Adds all of Friday's results together
     totalFridayResults = {}
     totalFridayResults.update(fBlue)
     totalFridayResults.update(fGreen)
@@ -95,6 +112,7 @@ if __name__ == '__main__':
     totalFridayResults.update(fPink)
     totalFridayResults.update(fYellow)
 
+    # Adds all of Saturday's results together
     totalSaturdayResults = {}
     totalSaturdayResults.update(sBlue)
     totalSaturdayResults.update(sGreen)
@@ -106,14 +124,29 @@ if __name__ == '__main__':
     totalSaturdayResults.update(sYellow)
 
     totalResults = {}
+
+    # Starts with Friday's results
     totalResults.update(totalFridayResults)
+
+    # For each quizzer in Friday's results:
     for quizzer in totalResults:
+        # Get's the quizzer's stats as an array from each day
         friQuizzer = totalFridayResults[quizzer]
         satQuizzer = totalSaturdayResults[quizzer]
+
+        # Adds the totals to get the quizzers total
         totalPoints = friQuizzer["Total"] + satQuizzer["Total"]
+
+        # Adds the number of rounds from each day to get the total number of rounds
         totalRounds = friQuizzer["NumberOfRounds"] + satQuizzer["NumberOfRounds"]
-        avg = round(totalPoints / totalRounds, 1)
+
+        # Calculates the average to 3 decimal points
+        avg = round(totalPoints / totalRounds, 3)
+
+        # Adds the quizouts from each day to get the total quizouts
         quizOuts = friQuizzer["Quizouts"] + satQuizzer["Quizouts"]
+
+        # Updates totalResults with the total stats instead of Friday's stats
         totalResults[quizzer]["Total"] = totalPoints
         totalResults[quizzer]["Quizouts"] = quizOuts
         totalResults[quizzer]["Avg"] = avg
@@ -121,8 +154,10 @@ if __name__ == '__main__':
         totalResults[quizzer]["SaturdayPlace"] = satQuizzer["Place"]
         totalResults[quizzer]["Accuracy"] = ((int(friQuizzer["Q%"]) + int(satQuizzer["Q%"])) / 2)
 
+
     totalResultsObjects = []
     for quizzer in totalResults:
+        # Creates a new QuizzerStats object and adds it to a list
         totalResultsObjects.append(QuizzerStats(
             name_and_team=quizzer,
             friday_place=totalResults[quizzer]["FridayPlace"],
@@ -133,8 +168,11 @@ if __name__ == '__main__':
             quiz_outs=totalResults[quizzer]["Quizouts"],
             accuracy=totalResults[quizzer]["Accuracy"]
         ))
+
+    # Sort quizzers by average to determine place
     totalResultsObjects.sort(key=lambda q: q.avg, reverse=True)
 
+    # Writes the results to a CSV file
     x = 0
     with open('files/final_results.csv', 'w') as f:
         w = csv.writer(f)
