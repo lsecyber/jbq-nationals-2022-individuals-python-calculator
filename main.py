@@ -95,14 +95,14 @@ if __name__ == '__main__':
     fPink = parse_file_to_data('f-pink', 'html', '- Total -')
     fLavender = parse_file_to_data('f-lavender', 'html', '- Total -')
 
-    sBlue = parse_file_to_data('s-blue', 'html', '- Total -')
-    sGreen = parse_file_to_data('s-green', 'html', '- Total -')
-    sLavender = parse_file_to_data('s-lavender', 'html', '- Total -')
-    sOrange = parse_file_to_data('s-orange', 'html', '- Total -')
-    sPink = parse_file_to_data('s-pink', 'html', '- Total -')
-    sSilver = parse_file_to_data('s-silver', 'html', '- Total -')
-    sTan = parse_file_to_data('s-tan', 'html', '- Total -')
-    sYellow = parse_file_to_data('s-yellow', 'html', '- Total -')
+    sBlue = parse_file_to_data('s-yellow', 'html', '- Total -')
+    sGreen = parse_file_to_data('s-white', 'html', '- Total -')
+    sLavender = parse_file_to_data('s-tan', 'html', '- Total -')
+    sOrange = parse_file_to_data('s-pink', 'html', '- Total -')
+    sPink = parse_file_to_data('s-orange', 'html', '- Total -')
+    sSilver = parse_file_to_data('s-lavender', 'html', '- Total -')
+    sTan = parse_file_to_data('s-green', 'html', '- Total -')
+    sYellow = parse_file_to_data('s-blue', 'html', '- Total -')
 
     # Adds all of Friday's results together
     totalFridayResults = {}
